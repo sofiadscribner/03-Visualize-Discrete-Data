@@ -1,0 +1,401 @@
+---
+title: "Visualize Discrete Data"
+subtitle: "MKTG 411 Marketing Analytics"
+output: 
+  ioslides_presentation:
+    widescreen: true
+    css: ../style.css
+---
+
+## Spiritual Thought
+
+DC 6:36: "Look unto me in every thought; doubt not, fear not."
+
+"As an apostle of the Lord Jesus Christ, I invoke these blessings upon you, that as you look to the Savior and trust in Him, you will be blessed with hope to overcome perplexity, with spiritual settledness to cut through commotion, with ears to hear and a heart to always remember the word of the Lord, and with the discernment to see things as they really are."
+
+David A. Bednar - [BYU Speeches, April 16th, 2021](https://speeches.byu.edu/talks/david-a-bednar/look-unto-me-in-every-thought-doubt-not-fear-not/)
+
+## Grading Exercises
+
+Remember that you grade your own submitted exercises using the rubric specified in each posted exercise solution, adding comments (**directly for R scripts** or using the comment feature for Word documents) where their solution differs from the posted solution.
+
+```{r}
+#| eval: false
+
+# Find the customers who have spent the most recently.
+customer_data |> 
+  left_join(store_transactions, join_by(customer_id)) |> 
+  # -1: I forgot to filter for the South and create a new age column.
+  select(age, gender:region, dec_2018) |> 
+  arrange(desc(dec_2018)) |> 
+  slice(1:3)
+```
+
+
+## Marketing Analytics Process
+
+<center>
+![](../../Figures/process_visualize.png){width=900px}
+</center>
+
+---
+
+![](../../Figures/hex_dplyr-ggplot2.png){width=900px}
+
+## Discrete Data
+
+Remember that summarizing data is initially all about discovery, the heart of **exploratory data analysis**.
+
+- Computing **statistics** (i.e., numerical summaries).
+- **Visualizing** data (i.e., graphical summaries).
+
+How we summarize depends on whether the data is **discrete** or *continuous*.
+
+- Discrete means "individually separate and distinct."
+- Discrete data are also called *qualitative* or *categorical*.
+
+---
+
+```{r}
+library(tidyverse)
+```
+
+---
+
+Can you identify any *discrete* variables? What are their data types in R?
+
+```{r eval=FALSE}
+customer_data <- read_csv("customer_data.csv")
+```
+
+```{r echo=FALSE}
+customer_data <- read_csv(here::here("Data", "customer_data.csv"))
+```
+
+## Summarize Discrete Data
+
+An important statistic for a discrete variable is a **count**.
+
+```{r}
+customer_data |> 
+  count(region)
+```
+
+---
+
+How would I get a count by both `region` and `college_degree` (i.e., a **cross-tab**)?
+
+---
+
+```{r}
+customer_data |> 
+  count(region, college_degree)
+```
+
+## Visualize Data
+
+{ggplot2} provides a consistent **grammar of graphics** built with **layers**.
+
+1. Data – Data to visualize.
+2. Aesthetics – Mapping graphical elements to data.
+3. Geometry – Or "geom," the graphic representing the data.
+4. Facets, Labels, Scales, etc.
+
+---
+
+<center>
+![](../../Figures/monsters_ggplot2-exploratory.png){width=600px}
+</center>
+
+## Visualize Discrete Data
+
+Plot our first summary (note how `+` is different from `|>`).
+
+```{r eval=FALSE}
+customer_data |> 
+  count(region) |> 
+  ggplot(aes(x = region, y = n)) +
+  geom_col()
+```
+
+---
+
+```{r echo=FALSE}
+customer_data |> 
+  count(region) |> 
+  ggplot(aes(x = region, y = n)) +
+  geom_col()
+```
+
+---
+
+Visualize our second summary by adding the aesthetic `fill = college_degree`.
+
+The geom `position` argument of the `geom_col()` function is set to `stack` by default. Try `fill` instead.
+
+---
+
+```{r}
+customer_data |> 
+  count(region, college_degree) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col()
+```
+
+---
+
+```{r}
+customer_data |> 
+  count(region, college_degree) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill")
+```
+
+## Facets
+
+Facets allow us to visualize by another discrete variable. For example, is this relationship different depending on `gender`?
+
+```{r eval=FALSE}
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender)
+```
+
+---
+
+```{r echo=FALSE}
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender)
+```
+
+## Labels and Scales
+
+It's no longer a count on the y-axis. Let's change the labels.
+
+```{r eval=FALSE}
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender) +
+  labs(
+    title = "Proportion of Customers with College Degrees by Region and Gender",
+    subtitle = "Based on 10,531 Customers in the CRM Database",
+    x = "Region",
+    y = "Proportion"
+  )
+```
+
+---
+
+```{r echo=FALSE}
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender) +
+  labs(
+    title = "Proportion of Customers with College Degrees by Region and Gender",
+    subtitle = "Based on 10,531 Customers in the CRM Database",
+    x = "Region",
+    y = "Proportion"
+  )
+```
+
+---
+
+What about the legend? And these *colors*?
+
+```{r eval=FALSE}
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender) +
+  labs(
+    title = "Proportion of Customers with College Degrees by Region and Gender",
+    subtitle = "Based on 10,531 Customers in the CRM Database",
+    x = "Region",
+    y = "Proportion"
+  ) +
+  scale_fill_manual(
+    name = "College Degree",
+    values = c("royalblue", "darkblue")
+  )
+```
+
+---
+
+```{r echo=FALSE}
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender) +
+  labs(
+    title = "Proportion of Customers with College Degrees by Region and Gender",
+    subtitle = "Based on 10,531 Customers in the CRM Database",
+    x = "Region",
+    y = "Proportion"
+  ) +
+  scale_fill_manual(
+    name = "College Degree",
+    values = c("royalblue", "darkblue")
+  )
+```
+
+## Text Data
+
+Text data is also discrete but it is **unstructured**.
+
+- Authors can express themselves freely.
+- The same idea can be expressed in many ways.
+
+What sort of structure might we impose on text data so we can visualize it?
+
+## Tokenize Text Data
+
+We can use `unnest_tokens()` to **tokenize** the text (i.e., split it into individual words or tokens).
+
+```{r}
+review_data <- customer_data |>
+  select(customer_id, review_text) |> 
+  tidytext::unnest_tokens(word, review_text)
+
+review_data
+```
+
+## Summarize Text Data
+
+With the text data tokenized, we can compute counts just like other discrete data.
+
+```{r}
+review_data |> 
+  count(word) |> 
+  arrange(desc(n))
+```
+
+## Drop Missing Data
+
+**Missing values** are (and should be) encoded as `NA`.
+
+```{r}
+review_data <- review_data |> 
+  drop_na(word)
+
+review_data
+```
+
+## Remove Stop Words
+
+Commonly used words aren’t very informative and are referred to as **stop words**.
+
+```{r}
+tidytext::stop_words
+```
+
+---
+
+This is just a data frame, and we know how to join data frames!
+
+An **anti join** keeps rows that *don't* have matching IDs and just the columns from the "left" data frame. (It's nearly the opposite of an inner join.)
+
+```{r}
+review_data <- review_data |>
+  anti_join(tidytext::stop_words, join_by(word))
+
+review_data |> 
+  count(word) |> 
+  arrange(desc(n))
+```
+
+---
+
+<center>
+![](../../Figures/anti_join.gif){width=500px}
+</center>
+
+## Visualize Word Counts
+
+```{r eval=FALSE}
+review_data |> 
+  count(word) |> 
+  arrange(desc(n)) |> 
+  ggplot(aes(x = word, y = n)) +
+  geom_col()
+```
+
+---
+
+What can we do to make this plot readable?
+
+```{r echo=FALSE}
+review_data |>
+  count(word) |>
+  arrange(desc(n)) |>
+  ggplot(aes(x = word, y = n)) +
+  geom_col()
+```
+
+## Factors
+
+Unlike a character variable, a **factor** can include information about order.
+
+- A factor's `levels` are numeric values that encode order.
+- A factor's `labels` are the character string associated with each level.
+
+```{r eval=FALSE}
+review_data |> 
+  count(word) |> 
+  arrange(desc(n)) |> 
+  slice(1:10) |> 
+  mutate(word = fct_reorder(word, n)) |>
+  ggplot(aes(x = n, y = word)) +
+  geom_col()
+```
+
+---
+
+```{r echo=FALSE}
+review_data |> 
+  count(word) |> 
+  arrange(desc(n)) |> 
+  slice(1:10) |> 
+  mutate(word = fct_reorder(word, n)) |>
+  ggplot(aes(x = n, y = word)) +
+  geom_col()
+```
+
+## Wrapping Up
+
+*Summary*
+
+- Computed counts, including tokenizing and counting text.
+- Practiced the basics of plotting with {ggplot2}.
+
+*Next Time*
+
+- Summarizing continuous data with {dplyr}.
+- Visualizing continuous data with {ggplot2}.
+
+*Supplementary Material*
+
+- *R for Data Science (2e)* Chapters 2 and 18
+
+*Artwork by @allison_horst*
+
+## Exercise 3
+
+In RStudio on Posit Cloud, create a new R script and do the following.
+
+1. Load the tidyverse.
+2. Import and explore `customer_data` using the functions we've covered.
+3. Provide at least one interesting numeric summary and one interesting visualization using discrete variables only.
+4. Practice good coding conventions: Comment often, write in consecutive lines of code using the `|>`, and use the demonstrated style (e.g., variable names, spacing within functions).
+5. Export the R script and upload to Canvas.
+
