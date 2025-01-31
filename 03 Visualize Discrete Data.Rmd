@@ -4,7 +4,7 @@ subtitle: "MKTG 411 Marketing Analytics"
 output: 
   ioslides_presentation:
     widescreen: true
-    css: ../style.css
+    css: style.css
 ---
 
 ## Spiritual Thought
@@ -35,12 +35,12 @@ customer_data |>
 ## Marketing Analytics Process
 
 <center>
-![](../../Figures/process_visualize.png){width=900px}
+![](Figures/process_visualize.png){width=900px}
 </center>
 
 ---
 
-![](../../Figures/hex_dplyr-ggplot2.png){width=900px}
+![](Figures/hex_dplyr-ggplot2.png){width=900px}
 
 ## Discrete Data
 
@@ -104,7 +104,7 @@ customer_data |>
 ---
 
 <center>
-![](../../Figures/monsters_ggplot2-exploratory.png){width=600px}
+![](Figures/monsters_ggplot2-exploratory.png){width=600px}
 </center>
 
 ## Visualize Discrete Data
@@ -317,7 +317,7 @@ review_data |>
 ---
 
 <center>
-![](../../Figures/anti_join.gif){width=500px}
+![](Figures/anti_join.gif){width=500px}
 </center>
 
 ## Visualize Word Counts
