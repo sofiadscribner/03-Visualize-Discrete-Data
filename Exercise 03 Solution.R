@@ -34,7 +34,7 @@ customer_data |>
   arrange(desc(n))
 
 # At least one interesting visualization. For example, the top 10
-# most commonly used word for 5-star reviews.
+# most commonly used words for 5-star reviews.
 customer_data |>
   filter(star_rating == 5) |> 
   select(review_text) |> 
