@@ -4,23 +4,238 @@ format: docx
 editor: visual
 ---
 
-## Quarto
+## Lecture 03 Notes
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
-
-## Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+### Discrete Data
 
 ```{r}
-1 + 1
-```
 
-You can add options to executable code like this
+# Load the tidyverse.
+
+library(tidyverse)
+```
 
 ```{r}
-#| echo: false
-2 * 2
+
+# Read in the customer data, and view it.
+
+customer_data <- read_csv("customer_data.csv", show_col_types = FALSE)
+glimpse(customer_data)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+### Summarize Discrete Data
+
+```{r}
+
+# This code counts how many customer reside in each region.
+
+customer_data |> 
+  count(region)
+```
+
+```{r}
+
+# This code returns a cross-tab of region and college degree status.
+
+customer_data |> 
+  count(region, college_degree)
+```
+
+### Your Turn!
+
+```{r}
+
+# Write code that filters the data to only unmarried customers then counts how many customers reside in each region.
+
+```
+
+### Visualize Discrete Data
+
+```{r}
+
+# This code creates a bar chart of the counts of customers in each region.
+
+customer_data |> 
+  count(region) |> 
+  ggplot(aes(x = region, y = n)) +
+  geom_col()
+
+```
+
+```{r}
+
+# This code creates a stacked bar chart of the region and college degree status cross-tab.
+
+customer_data |> 
+  count(region, college_degree) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col()
+```
+
+```{r}
+
+# This bar chart code shows the PROPORTION of customers in each region who have college degrees.
+
+customer_data |> 
+  count(region, college_degree) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill")
+```
+
+### Facets
+
+```{r}
+
+# This code recreates the bar chart above three times, once for each gender in the data.
+
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender)
+```
+
+### Labels and Scales
+
+```{r}
+
+# This code adds more effective labels to our visualization.
+
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender) +
+  labs(
+    title = "Proportion of Customers with College Degrees by Region and Gender",
+    subtitle = "Based on 10,531 Customers in the CRM Database",
+    x = "Region",
+    y = "Proportion"
+  )
+```
+
+```{r}
+
+# This code cleans up the legend label and specifies colors for the bars. Try adding your own colors! Many colors are included in ggplot by name, but you can also use hex codes with quotes around them.
+
+customer_data |> 
+  count(region, college_degree, gender) |> 
+  ggplot(aes(x = region, y = n, fill = college_degree)) +
+  geom_col(position = "fill") +
+  facet_wrap(~ gender) +
+  labs(
+    title = "Proportion of Customers with College Degrees by Region and Gender",
+    subtitle = "Based on 10,531 Customers in the CRM Database",
+    x = "Region",
+    y = "Proportion"
+  ) +
+  scale_fill_manual(
+    name = "College Degree",
+    values = c("cornflowerblue", "navy")
+  )
+```
+
+### Your Turn!
+
+```{r}
+
+# Add labels and colors to this graph to make it more polished.
+
+customer_data |> 
+  filter(region == "Northeast") |>
+  count(state, married) |> 
+  ggplot(aes(x = state, y = n, fill = married)) +
+  geom_col(position = "fill")
+```
+
+### Tokenize Text Data
+
+```{r}
+
+# First, click the Tools menu above and install the tidytext package.
+
+library(tidytext)
+```
+
+```{r}
+
+# This code separates each review into individual words, and saves this as a new dataset called "review_data."
+
+review_data <- customer_data |>
+  select(customer_id, review_text) |> 
+  unnest_tokens(word, review_text)
+
+review_data
+```
+
+### Summarize Text Data
+
+```{r}
+
+# This code arranges the words from most common to least.
+
+review_data |> 
+  count(word) |> 
+  arrange(desc(n))
+```
+
+### Drop Missing Data
+
+```{r}
+
+# This code removes blank reviews from the data.
+
+review_data <- review_data |> 
+  drop_na(word)
+
+review_data
+```
+
+### Remove Stop Words
+
+```{r}
+
+# This code displays the stop words data frame that is built into the tidytext package.
+
+stop_words
+```
+
+```{r}
+
+# This code uses an anti-join to remove the stop words from our review data, then arranges the remaining words from most to least common.
+
+review_data <- review_data |>
+  anti_join(stop_words, join_by(word))
+
+review_data |> 
+  count(word) |> 
+  arrange(desc(n))
+```
+
+### Visualize Word Counts
+
+```{r}
+
+# This code visualizes all the word counts.
+
+review_data |> 
+  count(word) |> 
+  arrange(desc(n)) |> 
+  ggplot(aes(x = word, y = n)) +
+  geom_col()
+```
+
+### Factors
+
+```{r}
+
+# This code takes the top ten most common words and sorts the graph in order from most common to least common using a factor.
+
+review_data |> 
+  count(word) |> 
+  arrange(desc(n)) |> 
+  slice(1:10) |> 
+  mutate(word = fct_reorder(word, n)) |>
+  ggplot(aes(x = n, y = word)) +
+  geom_col()
+```

@@ -127,7 +127,7 @@ customer_data |>
 
 ## Visualize Discrete Data
 
-Plot our first summary (note how `+` is different from `|>`).
+Let's plot our first summary (note how `+` is different from `|>`).
 
 ```{r eval=FALSE}
 customer_data |> 
@@ -243,7 +243,7 @@ customer_data |>
   ) +
   scale_fill_manual(
     name = "College Degree",
-    values = c("royalblue", "darkblue")
+    values = c("cornflowerblue", "navy")
   )
 ```
 
@@ -263,8 +263,65 @@ customer_data |>
   ) +
   scale_fill_manual(
     name = "College Degree",
-    values = c("royalblue", "darkblue")
+    values = c("cornflowerblue", "navy")
   )
+```
+
+
+## Your Turn!
+
+Look at the ggplot below (also found in your starter code). Figure out what summary it is displaying, and then add polished labels and colors to create a publication-ready graph.
+
+```{r eval=FALSE}
+customer_data |> 
+  filter(region == "Northeast") |>
+  count(state, married) |> 
+  ggplot(aes(x = state, y = n, fill = married)) +
+  geom_col(position = "fill")
+```
+
+## Possible Solution
+
+```{r eval=FALSE}
+
+customer_data |> 
+  filter(region == "Northeast") |>
+  count(state, married) |> 
+  ggplot(aes(x = state, y = n, fill = married)) +
+  geom_col(position = "fill") +
+  labs(
+    title = "Proportion of Married Customers in Each Northeast State",
+    subtitle = "Based on 3,224 Customers in the CRM Database",
+    x = "State",
+    y = "Proportion"
+  ) +
+  scale_fill_manual(
+    name = "Marital Status",
+    values = c("#B2AC88", "#4b5320")
+  )
+
+```
+
+---
+
+```{r echo=FALSE}
+
+customer_data |> 
+  filter(region == "Northeast") |>
+  count(state, married) |> 
+  ggplot(aes(x = state, y = n, fill = married)) +
+  geom_col(position = "fill") +
+  labs(
+    title = "Proportion of Married Customers in Each Northeast State",
+    subtitle = "Based on 3,224 Customers in the CRM Database",
+    x = "State",
+    y = "Proportion"
+  ) +
+  scale_fill_manual(
+    name = "Marital Status",
+    values = c("#B2AC88", "#4b5320")
+  )
+
 ```
 
 ## Text Data
@@ -281,9 +338,12 @@ What sort of structure might we impose on text data so we can visualize it?
 We can use `unnest_tokens()` to **tokenize** the text (i.e., split it into individual words or tokens).
 
 ```{r}
+
+library(tidytext)
+
 review_data <- customer_data |>
   select(customer_id, review_text) |> 
-  tidytext::unnest_tokens(word, review_text)
+  unnest_tokens(word, review_text)
 
 review_data
 ```
@@ -314,7 +374,7 @@ review_data
 Commonly used words aren’t very informative and are referred to as **stop words**.
 
 ```{r}
-tidytext::stop_words
+stop_words
 ```
 
 ---
@@ -325,7 +385,7 @@ An **anti join** returns rows that *don't* have matching IDs, keeping only the c
 
 ```{r}
 review_data <- review_data |>
-  anti_join(tidytext::stop_words, join_by(word))
+  anti_join(stop_words, join_by(word))
 
 review_data |> 
   count(word) |> 
@@ -389,6 +449,10 @@ review_data |>
   geom_col()
 ```
 
+## Live Coding
+
+Going back to our prompt from the beginning, imagine your manager specifically wants you to present on the customers in the South region, and provide a summary of what these customers are like, and what matters to them. How could we apply what we've learned today to accomplish this?
+
 ## Wrapping Up
 
 *Summary*
@@ -409,7 +473,7 @@ review_data |>
 
 ## Exercise 3
 
-In RStudio on Posit Cloud, create a new R script and do the following.
+In RStudio, create a new Quarto document and do the following.
 
 1. Load the tidyverse.
 2. Import and explore `customer_data` using the functions we've covered.
