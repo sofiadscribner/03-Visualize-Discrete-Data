@@ -17,19 +17,7 @@ David A. Bednar - [BYU Speeches, April 16th, 2021](https://speeches.byu.edu/talk
 
 ## Grading Exercises
 
-Remember that you grade your own submitted exercises using the rubric specified in each posted exercise solution, adding comments (**directly for R scripts** or using the comment feature for Word documents) where their solution differs from the posted solution.
-
-```{r}
-#| eval: false
-
-# Find the customers who have spent the most recently.
-customer_data |> 
-  left_join(store_transactions, join_by(customer_id)) |> 
-  # -1: I forgot to filter for the South and create a new age column.
-  select(age, gender:region, dec_2018) |> 
-  arrange(desc(dec_2018)) |> 
-  slice(1:3)
-```
+Remember that you grade your own submitted exercises using the rubric specified in each posted exercise solution, adding comments (using the comment feature for Word documents) where your solution differs from the posted solution.
 
 
 ## Marketing Analytics Process
@@ -41,6 +29,10 @@ customer_data |>
 ---
 
 ![](Figures/hex_dplyr-ggplot2.png){width=900px}
+## Motivating Example
+
+Imagine your manager at Patagonia is happy with your ability to filter and organize data, but she wants you to find another way to share your findings with stakeholders in a presentation you'll be giving tomorrow. What are some concise and effective ways that you could communicate data about Patagonia's customer base?
+
 
 ## Discrete Data
 
@@ -49,7 +41,7 @@ Remember that summarizing data is initially all about discovery, the heart of **
 - Computing **statistics** (i.e., numerical summaries).
 - **Visualizing** data (i.e., graphical summaries).
 
-How we summarize depends on whether the data is **discrete** or *continuous*.
+How we summarize depends on whether the data is **discrete** or **continuous**.
 
 - Discrete means "individually separate and distinct."
 - Discrete data are also called *qualitative* or *categorical*.
@@ -64,13 +56,23 @@ library(tidyverse)
 
 Can you identify any *discrete* variables? What are their data types in R?
 
-```{r eval=FALSE}
-customer_data <- read_csv("customer_data.csv")
+```{r}
+customer_data <- read_csv("customer_data.csv", show_col_types = FALSE)
+glimpse(customer_data)
 ```
 
-```{r echo=FALSE}
-customer_data <- read_csv(here::here("Data", "customer_data.csv"))
-```
+## A Word About Data Types
+
+Data **types** in R — as in all programming languages — are more than simple labels. They serve as essential instructions that tell the computer how to interpret and manipulate the values we provide. Some common ones include:
+
+| **Data Type**       | **Abbreviation** | **Description**                               |
+|---------------------|------------------|-----------------------------------------------|
+| `logical`           | `lgl`            | Boolean values: `TRUE`, `FALSE`, or `NA`      |
+| `integer`           | `int`            | Whole numbers (e.g. `1`, `42`)             |
+| `double` (numeric)  | `dbl`            | Decimal numbers (e.g. `3.14`, `2.0`)         |
+| `character`         | `chr`            | Text strings (e.g. `"hello"`, `"R"`)         |
+| `factor`            | `fct`            | Categorical data with fixed levels (e.g. `"Low"`, `"High"`)            |
+
 
 ## Summarize Discrete Data
 
@@ -92,13 +94,29 @@ customer_data |>
   count(region, college_degree)
 ```
 
+## Your Turn!
+
+Write code that first filters the data to only unmarried customers, then counts the customers in each region (you will need to use code we learned in the last lecture to do this!)
+
+## Solution
+
+```{r}
+
+customer_data |>
+  filter(married == 'No') |>
+  count(region)
+
+```
+
+
+
 ## Visualize Data
 
 {ggplot2} provides a consistent **grammar of graphics** built with **layers**.
 
 1. Data – Data to visualize.
-2. Aesthetics – Mapping graphical elements to data.
-3. Geometry – Or "geom," the graphic representing the data.
+2. Aesthetics – Or "aes," mapping graphical elements to data.
+3. Geometry – Or "geom," the kind of graph representing the data.
 4. Facets, Labels, Scales, etc.
 
 ---
@@ -303,7 +321,7 @@ tidytext::stop_words
 
 This is just a data frame, and we know how to join data frames!
 
-An **anti join** keeps rows that *don't* have matching IDs and just the columns from the "left" data frame. (It's nearly the opposite of an inner join.)
+An **anti join** returns rows that *don't* have matching IDs, keeping only the columns from the "left" data frame. (Think of it as the opposite of an inner join.)
 
 ```{r}
 review_data <- review_data |>
