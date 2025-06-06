@@ -479,5 +479,5 @@ In RStudio, create a new Quarto document and do the following.
 2. Import and explore `customer_data` using the functions we've covered.
 3. Provide at least one interesting numeric summary and one interesting visualization using discrete variables only.
 4. Practice good coding conventions: Comment often, write in consecutive lines of code using the `|>`, and use the demonstrated style (e.g., variable names, spacing within functions).
-5. Export the R script and upload to Canvas.
+5. Render the Word doc and upload to Canvas.
 
